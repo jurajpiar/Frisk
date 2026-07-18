@@ -120,6 +120,49 @@ final class CompressedArchiveReaderTests: XCTestCase {
         XCTAssertEqual(try Data(contentsOf: out), firstData)
     }
 
+    // MARK: - Real-world fixtures (formats SWCompression can't create in-process)
+
+    /// Locate a checked-in fixture in the test bundle.
+    private func fixture(_ name: String, _ ext: String) throws -> URL {
+        let bundle = Bundle(for: type(of: self))
+        return try XCTUnwrap(bundle.url(forResource: name, withExtension: ext),
+                             "missing fixture \(name).\(ext) in test bundle")
+    }
+
+    /// `.7z` — SWCompression is read-only for 7z, so this uses a real archive built by
+    /// libarchive (bsdtar --format 7zip). Verifies list + exact-bytes extraction.
+    func testSevenZipFixture() throws {
+        let url = try fixture("fixture", "7z")
+        let reader = ArchiveReaders.reader(for: url)
+        XCTAssertTrue(reader is CompressedArchiveReader)
+
+        let byPath = Dictionary(uniqueKeysWithValues: try reader.listEntries().map { ($0.path, $0) })
+        let first = try XCTUnwrap(byPath["first.txt"])
+        XCTAssertEqual(first.uncompressedSize, UInt64(firstData.count))
+        let second = try XCTUnwrap(byPath["nested/second.bin"])
+        XCTAssertEqual(second.uncompressedSize, UInt64(secondData.count))
+
+        let out = tempDir.appendingPathComponent("7z-out.bin")
+        try reader.extractEntry(atPath: "nested/second.bin", to: out)
+        XCTAssertEqual(try Data(contentsOf: out), secondData)
+    }
+
+    /// `.xz` — no xz encoder in SWCompression, so this uses a real single-file stream
+    /// produced by the `xz` tool. Lists as one entry with the `.xz` suffix stripped.
+    func testXzFixture() throws {
+        let url = try fixture("note.txt", "xz")
+        let reader = ArchiveReaders.reader(for: url)
+        XCTAssertTrue(reader is CompressedArchiveReader)
+
+        let entries = try reader.listEntries()
+        XCTAssertEqual(entries.count, 1)
+        XCTAssertEqual(entries.first?.fileName, "note.txt")
+
+        let out = tempDir.appendingPathComponent("xz-out.txt")
+        try reader.extractEntry(atPath: entries[0].path, to: out)
+        XCTAssertEqual(try Data(contentsOf: out), firstData)
+    }
+
     // MARK: - Guards
 
     func testZipSlipPathRejected() throws {
