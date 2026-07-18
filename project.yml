@@ -57,6 +57,7 @@ targets:
       properties:
         CFBundleDisplayName: Frisk
         CFBundleDevelopmentRegion: en_GB
+        CFBundleIconFile: AppIcon
         LSApplicationCategoryType: public.app-category.utilities
         CFBundleDocumentTypes:
           - CFBundleTypeName: Archive
