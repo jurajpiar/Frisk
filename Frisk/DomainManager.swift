@@ -58,13 +58,13 @@ final class DomainManager: ObservableObject {
             if started { url.stopAccessingSecurityScopedResource() }
             let domainID = "zip-" + UUID().uuidString
             let displayName = url.lastPathComponent
-            ZipDomainStore.set(bookmark: bookmark, displayName: displayName, forDomainID: domainID)
+            ArchiveDomainStore.set(bookmark: bookmark, displayName: displayName, forDomainID: domainID)
             let domain = NSFileProviderDomain(identifier: .init(domainID), displayName: displayName)
             NSFileProviderManager.add(domain) { [weak self] error in
                 Task { @MainActor in
                     if let error {
                         self?.lastMessage = "Could not mount \(displayName): \(error.localizedDescription)"
-                        ZipDomainStore.remove(domainID: domainID)
+                        ArchiveDomainStore.remove(domainID: domainID)
                     } else {
                         self?.lastMessage = "Mounted \(displayName)"
                         self?.reveal(domainID: domainID)
@@ -81,7 +81,7 @@ final class DomainManager: ObservableObject {
 
     /// Open the domain's Finder location.
     func reveal(domainID: String) {
-        let displayName = ZipDomainStore.displayName(forDomainID: domainID) ?? ""
+        let displayName = ArchiveDomainStore.displayName(forDomainID: domainID) ?? ""
         let domain = NSFileProviderDomain(identifier: .init(domainID), displayName: displayName)
         guard let manager = NSFileProviderManager(for: domain) else { return }
         manager.getUserVisibleURL(for: .rootContainer) { url, _ in
@@ -96,10 +96,10 @@ final class DomainManager: ObservableObject {
 
     /// Unmount and forget a domain.
     func remove(domainID: String) {
-        let displayName = ZipDomainStore.displayName(forDomainID: domainID) ?? ""
+        let displayName = ArchiveDomainStore.displayName(forDomainID: domainID) ?? ""
         let domain = NSFileProviderDomain(identifier: .init(domainID), displayName: displayName)
         NSFileProviderManager.remove(domain) { [weak self] _ in
-            ZipDomainStore.remove(domainID: domainID)
+            ArchiveDomainStore.remove(domainID: domainID)
             Task { @MainActor in
                 self?.lastMessage = "Removed \(displayName)"
                 self?.refresh()

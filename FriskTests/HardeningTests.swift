@@ -61,33 +61,33 @@ final class HardeningTests: XCTestCase {
 
     /// Step 1: the failure message singles out the (likely) encrypted / not-found case.
     func testExtractionFailureMessageForNotFound() {
-        let text = ZipFilePromiseDelegate.informativeText(for: ZipReaderError.entryNotFound("x"))
+        let text = ArchiveFilePromiseDelegate.informativeText(for: ArchiveReaderError.entryNotFound("x"))
         XCTAssertTrue(text.lowercased().contains("password-protected"))
     }
 
     // MARK: - Hostile size fields (regression for a footer/HTML arithmetic-overflow trap)
 
-    private func huge(_ path: String) -> ZipEntryItem {
-        ZipEntryItem(id: path, path: path, fileName: path, isDirectory: false,
+    private func huge(_ path: String) -> ArchiveEntryItem {
+        ArchiveEntryItem(id: path, path: path, fileName: path, isDirectory: false,
                      uncompressedSize: .max, compressedSize: .max, modificationDate: nil)
     }
 
     func testImplausibleSizesExcludedFromTotal() {
         // Implausible (>1 PiB) sizes are treated as unreadable, not summed — so no crash
         // and no fabricated figure. A mix: one real (100 B) + one garbage (UInt64.max).
-        let real = ZipEntryItem(id: "r", path: "r", fileName: "r", isDirectory: false,
+        let real = ArchiveEntryItem(id: "r", path: "r", fileName: "r", isDirectory: false,
                                 uncompressedSize: 100, compressedSize: 100, modificationDate: nil)
         let entries = [real, huge("g")]
-        XCTAssertTrue(ZipEntryItem.hasUnreliableSizes(in: entries))
+        XCTAssertTrue(ArchiveEntryItem.hasUnreliableSizes(in: entries))
         XCTAssertFalse(real.isSizeReliable == false)
         XCTAssertFalse(huge("g").isSizeReliable)
         // Total counts only the reliable entry (garbage excluded), never Int64.max.
-        XCTAssertEqual(ZipEntryItem.totalUncompressedByteCount(of: entries), 100)
+        XCTAssertEqual(ArchiveEntryItem.totalUncompressedByteCount(of: entries), 100)
     }
 
     func testFooterOmitsTotalWhenSizesUnreliable() {
         // Rendering a listing with absurd sizes must not crash, and must not show a total.
-        let html = ZipListingHTML.render(for: [huge("a.bin"), huge("b.bin")], name: "evil.zip")
+        let html = ArchiveListingHTML.render(for: [huge("a.bin"), huge("b.bin")], name: "evil.zip")
         XCTAssertTrue(html.contains("2 files"))
         XCTAssertTrue(html.contains("some sizes unavailable"))
         XCTAssertFalse(html.contains(" total"), "no fabricated total when sizes are garbage")
@@ -96,8 +96,8 @@ final class HardeningTests: XCTestCase {
     // MARK: - Preview size cap (zip-bomb DoS guard)
 
     func testPreviewSizeCap() {
-        func md(_ size: UInt64) -> ZipEntryItem {
-            ZipEntryItem(id: "x", path: "x", fileName: "x.md", isDirectory: false,
+        func md(_ size: UInt64) -> ArchiveEntryItem {
+            ArchiveEntryItem(id: "x", path: "x", fileName: "x.md", isDirectory: false,
                          uncompressedSize: size, compressedSize: 1, modificationDate: nil)
         }
         XCTAssertTrue(InAppTextPreview.isPreviewable(md(1_000)))                // small → ok

@@ -5,7 +5,7 @@ import Foundation
 /// container (`bookmarks/<domainID>.bookmark` + `.name`), read directly to bypass
 /// cfprefsd caching — the File Provider extension doesn't reliably see the app's
 /// UserDefaults writes.
-enum ZipDomainStore {
+enum ArchiveDomainStore {
     /// Dedicated sharing group — separate from the FP-managed document group.
     static let appGroupID = "group.org.deadkittens.frisk.share"
 

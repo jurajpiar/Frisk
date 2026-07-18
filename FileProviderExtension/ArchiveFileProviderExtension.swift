@@ -6,7 +6,7 @@ let fpLog = Logger(subsystem: "org.deadkittens.Frisk.FileProvider", category: "f
 
 /// Read-only `NSFileProviderReplicatedExtension` that presents an archive as a file tree.
 /// M2 uses `StaticBackend` to prove enumeration/materialisation; M3 swaps in a zip backend.
-final class ZipFileProviderExtension: NSObject, NSFileProviderReplicatedExtension {
+final class ArchiveFileProviderExtension: NSObject, NSFileProviderReplicatedExtension {
     private let backend: ProviderBackend
     private let tree: FPTree
 
@@ -16,7 +16,7 @@ final class ZipFileProviderExtension: NSObject, NSFileProviderReplicatedExtensio
         let did = domain.identifier.rawValue
         // Resolve the domain's security-scoped bookmark (shared via App Group UserDefaults)
         // and read the user's original zip.
-        if let bookmark = ZipDomainStore.bookmark(forDomainID: did) {
+        if let bookmark = ArchiveDomainStore.bookmark(forDomainID: did) {
             if let zip = ZipBackend(bookmark: bookmark, displayName: domain.displayName), zip.loadedCount > 0 {
                 self.backend = zip
             } else {
@@ -26,7 +26,7 @@ final class ZipFileProviderExtension: NSObject, NSFileProviderReplicatedExtensio
             }
         } else {
             // Probe the bookmark file directly to see what the extension can access.
-            let f = ZipDomainStore.containerURL()?
+            let f = ArchiveDomainStore.containerURL()?
                 .appendingPathComponent("bookmarks").appendingPathComponent("\(did).bookmark")
             let exists = f.map { FileManager.default.fileExists(atPath: $0.path) } ?? false
             var readInfo = "noURL"
@@ -34,7 +34,7 @@ final class ZipFileProviderExtension: NSObject, NSFileProviderReplicatedExtensio
                 do { let d = try Data(contentsOf: f); readInfo = "read\(d.count)B" }
                 catch { readInfo = "readERR" }
             }
-            self.backend = DiagnosticBackend(reason: "nobm-exists\(exists)-\(readInfo)-ids\(ZipDomainStore.allDomainIDs().count)")
+            self.backend = DiagnosticBackend(reason: "nobm-exists\(exists)-\(readInfo)-ids\(ArchiveDomainStore.allDomainIDs().count)")
         }
         self.tree = FPTree(rootName: backend.rootName(), files: backend.files())
         super.init()

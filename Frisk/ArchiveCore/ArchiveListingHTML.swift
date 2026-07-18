@@ -1,15 +1,15 @@
 import Foundation
 
 /// Renders a zip entry listing as a self-contained HTML document for the Quick Look
-/// preview (D3). Lives in ZipCore so it is shared by the extension and unit-tested by
+/// preview (D3). Lives in ArchiveCore so it is shared by the extension and unit-tested by
 /// the app's test target. Entry names are attacker-controlled, so every displayed
 /// string is HTML-escaped.
-enum ZipListingHTML {
+enum ArchiveListingHTML {
 
     /// Maximum rows rendered; anything beyond gets a single summary row.
     static let rowCap = 1000
 
-    static func render(for entries: [ZipEntryItem], name: String) -> String {
+    static func render(for entries: [ArchiveEntryItem], name: String) -> String {
         let byteFormatter = ByteCountFormatter()
         byteFormatter.countStyle = .file
 
@@ -19,10 +19,10 @@ enum ZipListingHTML {
 
         let files = entries.filter { !$0.isDirectory }
         let summary: String
-        if ZipEntryItem.hasUnreliableSizes(in: entries) {
+        if ArchiveEntryItem.hasUnreliableSizes(in: entries) {
             summary = "\(files.count) files (some sizes unavailable)"
         } else {
-            let totalText = byteFormatter.string(fromByteCount: ZipEntryItem.totalUncompressedByteCount(of: entries))
+            let totalText = byteFormatter.string(fromByteCount: ArchiveEntryItem.totalUncompressedByteCount(of: entries))
             summary = "\(files.count) files, \(totalText) total"
         }
 

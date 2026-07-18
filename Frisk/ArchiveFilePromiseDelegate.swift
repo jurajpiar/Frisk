@@ -4,7 +4,7 @@ import AppKit
 /// drop lands — `filePromiseProvider(_:writePromiseTo:completionHandler:)` is the only
 /// call site that writes bytes (D6). Extraction runs on a private serial queue, never
 /// the main thread.
-final class ZipFilePromiseDelegate: NSObject, NSFilePromiseProviderDelegate {
+final class ArchiveFilePromiseDelegate: NSObject, NSFilePromiseProviderDelegate {
     private let archiveURL: URL
     private let reader: ArchiveReading
 
@@ -34,7 +34,7 @@ final class ZipFilePromiseDelegate: NSObject, NSFilePromiseProviderDelegate {
                              writePromiseTo url: URL,
                              completionHandler: @escaping (Error?) -> Void) {
         guard let entryPath = filePromiseProvider.userInfo as? String else {
-            completionHandler(ZipReaderError.entryNotFound("?"))
+            completionHandler(ArchiveReaderError.entryNotFound("?"))
             return
         }
         // Re-assert read access to the source archive for this write (persistent for
@@ -75,7 +75,7 @@ final class ZipFilePromiseDelegate: NSObject, NSFilePromiseProviderDelegate {
     static func informativeText(for error: Error) -> String {
         // ZIPFoundation 0.9.20 omits encrypted entries from the listing, so an encrypted
         // entry usually surfaces as "not found" at extraction time.
-        if case ZipReaderError.entryNotFound = error {
+        if case ArchiveReaderError.entryNotFound = error {
             return "This entry could not be read. If the archive is encrypted, note that "
                  + "Frisk cannot extract password-protected entries yet."
         }

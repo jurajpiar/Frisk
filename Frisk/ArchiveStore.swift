@@ -13,7 +13,7 @@ final class ArchiveStore: ObservableObject {
     enum LoadState: Sendable {
         case empty
         case loading
-        case loaded([ZipEntryItem])
+        case loaded([ArchiveEntryItem])
         case failed(String)
     }
 
@@ -70,12 +70,12 @@ final class ArchiveStore: ObservableObject {
     /// Human-readable, British-English error text for the error state.
     private nonisolated static func message(for error: Error) -> String {
         switch error {
-        case ZipReaderError.cannotOpen:
+        case ArchiveReaderError.cannotOpen:
             return "Could not open this file as a zip archive. It may be corrupt, "
                  + "encrypted at the container level, or not a zip file at all."
-        case ZipReaderError.entryNotFound(let path):
+        case ArchiveReaderError.entryNotFound(let path):
             return "An expected entry was missing from the archive: \(path)."
-        case ZipReaderError.unsafeEntryPath(let path):
+        case ArchiveReaderError.unsafeEntryPath(let path):
             return "The archive contains an unsafe entry path and was not read: \(path)."
         default:
             return "The archive could not be read.\n\n\(error.localizedDescription)"

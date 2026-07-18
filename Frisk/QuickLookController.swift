@@ -11,10 +11,10 @@ final class QuickLookController: NSObject, QLPreviewPanelDataSource, QLPreviewPa
     private var extracted: [String: URL] = [:]   // entry path -> extracted temp file URL
 
     /// The file entries currently offered to the panel (snapshot of the selection).
-    private(set) var previewEntries: [ZipEntryItem] = []
+    private(set) var previewEntries: [ArchiveEntryItem] = []
 
     /// Supplies the current table selection (set by the table view).
-    var selectionProvider: () -> [ZipEntryItem] = { [] }
+    var selectionProvider: () -> [ArchiveEntryItem] = { [] }
     /// The table, so the panel can forward arrow keys to move the selection.
     weak var tableView: NSTableView?
 
@@ -52,14 +52,14 @@ final class QuickLookController: NSObject, QLPreviewPanelDataSource, QLPreviewPa
     }
 
     /// File entries in the current selection.
-    func selectedFiles() -> [ZipEntryItem] { selectionProvider().filter { !$0.isDirectory } }
+    func selectedFiles() -> [ArchiveEntryItem] { selectionProvider().filter { !$0.isDirectory } }
 
     /// Extract `entry` to a temp file and return its URL (for the in-app markdown preview
     /// and its "Open with…" button).
-    func extractedURL(for entry: ZipEntryItem) -> URL? { url(for: entry) }
+    func extractedURL(for entry: ArchiveEntryItem) -> URL? { url(for: entry) }
 
     /// Extract (once) the entry to a temp file and return its URL.
-    private func url(for entry: ZipEntryItem) -> URL? {
+    private func url(for entry: ArchiveEntryItem) -> URL? {
         if let cached = extracted[entry.path] { return cached }
         // Each entry gets its own subdirectory so the extracted file keeps its real name
         // (and name collisions between different paths can't clash).

@@ -48,7 +48,7 @@ final class CompressedArchiveReaderTests: XCTestCase {
         let reader = ArchiveReaders.reader(for: url)
         XCTAssertTrue(reader is CompressedArchiveReader)
         let entries = try reader.listEntries()
-        let byPath = Dictionary(uniqueKeysWithValues: entries.map { ($0.path, $0) })
+        let byPath = Dictionary(entries.map { ($0.path, $0) }, uniquingKeysWith: { first, _ in first })
 
         let first = try XCTUnwrap(byPath["first.txt"])
         XCTAssertFalse(first.isDirectory)
@@ -136,7 +136,8 @@ final class CompressedArchiveReaderTests: XCTestCase {
         let reader = ArchiveReaders.reader(for: url)
         XCTAssertTrue(reader is CompressedArchiveReader)
 
-        let byPath = Dictionary(uniqueKeysWithValues: try reader.listEntries().map { ($0.path, $0) })
+        let entries = try reader.listEntries()
+        let byPath = Dictionary(entries.map { ($0.path, $0) }, uniquingKeysWith: { first, _ in first })
         let first = try XCTUnwrap(byPath["first.txt"])
         XCTAssertEqual(first.uncompressedSize, UInt64(firstData.count))
         let second = try XCTUnwrap(byPath["nested/second.bin"])
@@ -170,7 +171,7 @@ final class CompressedArchiveReaderTests: XCTestCase {
         let reader = ArchiveReaders.reader(for: url)
         let out = tempDir.appendingPathComponent("escape")
         XCTAssertThrowsError(try reader.extractEntry(atPath: "../escape", to: out)) { error in
-            guard case ZipReaderError.unsafeEntryPath = error else {
+            guard case ArchiveReaderError.unsafeEntryPath = error else {
                 return XCTFail("expected unsafeEntryPath, got \(error)")
             }
         }
@@ -181,7 +182,7 @@ final class CompressedArchiveReaderTests: XCTestCase {
         let reader = ArchiveReaders.reader(for: url)
         let out = tempDir.appendingPathComponent("nope")
         XCTAssertThrowsError(try reader.extractEntry(atPath: "does-not-exist.txt", to: out)) { error in
-            guard case ZipReaderError.entryNotFound = error else {
+            guard case ArchiveReaderError.entryNotFound = error else {
                 return XCTFail("expected entryNotFound, got \(error)")
             }
         }

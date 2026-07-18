@@ -47,7 +47,7 @@ struct ContentView: View {
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
-    private func loaded(_ entries: [ZipEntryItem], archiveURL: URL) -> some View {
+    private func loaded(_ entries: [ArchiveEntryItem], archiveURL: URL) -> some View {
         VStack(spacing: 0) {
             EntryTableView(entries: entries, archiveURL: archiveURL)
             Divider()
@@ -55,15 +55,15 @@ struct ContentView: View {
         }
     }
 
-    private func footer(for entries: [ZipEntryItem]) -> some View {
+    private func footer(for entries: [ArchiveEntryItem]) -> some View {
         let files = entries.filter { !$0.isDirectory }
         // Omit the total when any size is unreadable, rather than show a fabricated figure.
         let summary: String
-        if ZipEntryItem.hasUnreliableSizes(in: entries) {
+        if ArchiveEntryItem.hasUnreliableSizes(in: entries) {
             summary = "\(files.count) files (some sizes unavailable)"
         } else {
             let totalText = ByteCountFormatter.string(
-                fromByteCount: ZipEntryItem.totalUncompressedByteCount(of: entries), countStyle: .file)
+                fromByteCount: ArchiveEntryItem.totalUncompressedByteCount(of: entries), countStyle: .file)
             summary = "\(files.count) files, \(totalText) total"
         }
         return HStack {

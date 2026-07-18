@@ -6,7 +6,7 @@ import Quartz   // QLPreviewPanel for in-app Quick Look
 /// AppKit `NSTableView` (in an `NSScrollView`) wrapped for SwiftUI (D5). Shows the entry
 /// listing and, via the same `Coordinator`, drags a row out as a file promise (D6).
 struct EntryTableView: NSViewRepresentable {
-    let entries: [ZipEntryItem]
+    let entries: [ArchiveEntryItem]
     let archiveURL: URL
 
     private enum Column {
@@ -77,10 +77,10 @@ struct EntryTableView: NSViewRepresentable {
     // MARK: - Coordinator
 
     final class Coordinator: NSObject, NSTableViewDataSource, NSTableViewDelegate {
-        var entries: [ZipEntryItem]
+        var entries: [ArchiveEntryItem]
         private(set) var archiveURL: URL
         /// Rebuilt whenever the open archive changes so promises extract from the right file.
-        private(set) var promiseDelegate: ZipFilePromiseDelegate
+        private(set) var promiseDelegate: ArchiveFilePromiseDelegate
         /// Drives the in-app Quick Look panel; rebuilt when the open archive changes.
         private(set) var quickLookController: QuickLookController
         weak var tableView: NSTableView?
@@ -98,18 +98,18 @@ struct EntryTableView: NSViewRepresentable {
             return f
         }()
 
-        init(entries: [ZipEntryItem], archiveURL: URL) {
+        init(entries: [ArchiveEntryItem], archiveURL: URL) {
             self.entries = entries
             self.archiveURL = archiveURL
-            self.promiseDelegate = ZipFilePromiseDelegate(archiveURL: archiveURL)
+            self.promiseDelegate = ArchiveFilePromiseDelegate(archiveURL: archiveURL)
             self.quickLookController = QuickLookController(archiveURL: archiveURL)
         }
 
-        func update(entries: [ZipEntryItem], archiveURL: URL) {
+        func update(entries: [ArchiveEntryItem], archiveURL: URL) {
             self.entries = entries
             if archiveURL != self.archiveURL {
                 self.archiveURL = archiveURL
-                self.promiseDelegate = ZipFilePromiseDelegate(archiveURL: archiveURL)
+                self.promiseDelegate = ArchiveFilePromiseDelegate(archiveURL: archiveURL)
                 quickLookController.cleanup()
                 quickLookController = QuickLookController(archiveURL: archiveURL)
                 rewireQuickLook()

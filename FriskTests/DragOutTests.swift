@@ -38,7 +38,7 @@ final class DragOutTests: XCTestCase {
         try super.tearDownWithError()
     }
 
-    private func entries() throws -> [ZipEntryItem] {
+    private func entries() throws -> [ArchiveEntryItem] {
         try ZipArchiveReader(archiveURL: archiveURL).listEntries()
     }
 
@@ -64,7 +64,7 @@ final class DragOutTests: XCTestCase {
     // MARK: - Extraction happens only on the promise write, and is byte-exact
 
     func testWritePromiseExtractsExactBytes() throws {
-        let delegate = ZipFilePromiseDelegate(archiveURL: archiveURL)
+        let delegate = ArchiveFilePromiseDelegate(archiveURL: archiveURL)
         let provider = NSFilePromiseProvider(fileType: UTType.data.identifier, delegate: delegate)
         provider.userInfo = "folder/payload.bin"
 

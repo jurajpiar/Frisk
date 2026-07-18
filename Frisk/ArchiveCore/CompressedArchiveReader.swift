@@ -33,7 +33,7 @@ struct CompressedArchiveReader: ArchiveReading {
 
     // MARK: - Listing
 
-    func listEntries() throws -> [ZipEntryItem] {
+    func listEntries() throws -> [ArchiveEntryItem] {
         let data = try loadData()
         switch try detectFormat() {
         case .tar:      return tarEntries(try TarContainer.open(container: data))
@@ -53,7 +53,7 @@ struct CompressedArchiveReader: ArchiveReading {
         // Zip-slip guard (same policy as ZipArchiveReader).
         let components = (path as NSString).pathComponents
         guard !components.contains(".."), !path.hasPrefix("/") else {
-            throw ZipReaderError.unsafeEntryPath(path)
+            throw ArchiveReaderError.unsafeEntryPath(path)
         }
         let data = try loadData()
         let bytes: Data
@@ -72,38 +72,38 @@ struct CompressedArchiveReader: ArchiveReading {
 
     // MARK: - Mapping helpers
 
-    private func tarEntries(_ entries: [TarEntry]) -> [ZipEntryItem] {
+    private func tarEntries(_ entries: [TarEntry]) -> [ArchiveEntryItem] {
         entries.map { item(name: $0.info.name, isDir: $0.info.type == .directory,
                            size: $0.info.size, mtime: $0.info.modificationTime) }
     }
 
-    private func sevenZipEntries(_ entries: [SevenZipEntry]) -> [ZipEntryItem] {
+    private func sevenZipEntries(_ entries: [SevenZipEntry]) -> [ArchiveEntryItem] {
         entries.map { item(name: $0.info.name, isDir: $0.info.type == .directory,
                            size: $0.info.size, mtime: $0.info.modificationTime) }
     }
 
-    private func item(name: String, isDir: Bool, size: Int?, mtime: Date?) -> ZipEntryItem {
-        ZipEntryItem(id: name, path: name, fileName: (name as NSString).lastPathComponent,
+    private func item(name: String, isDir: Bool, size: Int?, mtime: Date?) -> ArchiveEntryItem {
+        ArchiveEntryItem(id: name, path: name, fileName: (name as NSString).lastPathComponent,
                      isDirectory: isDir, uncompressedSize: UInt64(max(0, size ?? 0)),
                      compressedSize: 0, modificationDate: mtime)
     }
 
     private func tarData(_ entries: [TarEntry], path: String) throws -> Data {
         guard let entry = entries.first(where: { $0.info.name == path }) else {
-            throw ZipReaderError.entryNotFound(path)
+            throw ArchiveReaderError.entryNotFound(path)
         }
         return entry.data ?? Data()
     }
 
     private func sevenZipData(_ entries: [SevenZipEntry], path: String) throws -> Data {
         guard let entry = entries.first(where: { $0.info.name == path }) else {
-            throw ZipReaderError.entryNotFound(path)
+            throw ArchiveReaderError.entryNotFound(path)
         }
         return entry.data ?? Data()
     }
 
     /// A single-file compressed archive (`foo.txt.gz`) lists as one entry named `foo.txt`.
-    private func singleFileEntry(size: Int, stripping suffix: String) -> ZipEntryItem {
+    private func singleFileEntry(size: Int, stripping suffix: String) -> ArchiveEntryItem {
         var name = archiveURL.lastPathComponent
         if name.lowercased().hasSuffix(suffix) { name = String(name.dropLast(suffix.count)) }
         return item(name: name, isDir: false, size: size, mtime: nil)

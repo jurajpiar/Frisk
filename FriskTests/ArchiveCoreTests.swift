@@ -2,7 +2,7 @@ import XCTest
 import ZIPFoundation
 @testable import Frisk
 
-final class ZipCoreTests: XCTestCase {
+final class ArchiveCoreTests: XCTestCase {
 
     private var tempDir: URL!
     private var archiveURL: URL!
@@ -14,7 +14,7 @@ final class ZipCoreTests: XCTestCase {
     override func setUpWithError() throws {
         try super.setUpWithError()
         tempDir = FileManager.default.temporaryDirectory
-            .appendingPathComponent("ZipCoreTests-\(UUID().uuidString)", isDirectory: true)
+            .appendingPathComponent("ArchiveCoreTests-\(UUID().uuidString)", isDirectory: true)
         try FileManager.default.createDirectory(at: tempDir, withIntermediateDirectories: true)
         archiveURL = tempDir.appendingPathComponent("fixture.zip")
 
@@ -51,7 +51,7 @@ final class ZipCoreTests: XCTestCase {
         // At least the 3 entries we wrote.
         XCTAssertGreaterThanOrEqual(entries.count, 3)
 
-        let byPath = Dictionary(uniqueKeysWithValues: entries.map { ($0.path, $0) })
+        let byPath = Dictionary(entries.map { ($0.path, $0) }, uniquingKeysWith: { first, _ in first })
 
         let first = try XCTUnwrap(byPath["first.txt"])
         XCTAssertEqual(first.fileName, "first.txt")
@@ -82,7 +82,7 @@ final class ZipCoreTests: XCTestCase {
         let reader = ZipArchiveReader(archiveURL: archiveURL)
         let dest = tempDir.appendingPathComponent("nope")
         XCTAssertThrowsError(try reader.extractEntry(atPath: "does/not/exist", to: dest)) { error in
-            guard case ZipReaderError.entryNotFound = error else {
+            guard case ArchiveReaderError.entryNotFound = error else {
                 return XCTFail("expected entryNotFound, got \(error)")
             }
         }
@@ -94,7 +94,7 @@ final class ZipCoreTests: XCTestCase {
         let reader = ZipArchiveReader(archiveURL: archiveURL)
         let dest = tempDir.appendingPathComponent("slip")
         XCTAssertThrowsError(try reader.extractEntry(atPath: "../../etc/passwd", to: dest)) { error in
-            guard case ZipReaderError.unsafeEntryPath = error else {
+            guard case ArchiveReaderError.unsafeEntryPath = error else {
                 return XCTFail("expected unsafeEntryPath, got \(error)")
             }
         }
@@ -104,7 +104,7 @@ final class ZipCoreTests: XCTestCase {
         let reader = ZipArchiveReader(archiveURL: archiveURL)
         let dest = tempDir.appendingPathComponent("slip-abs")
         XCTAssertThrowsError(try reader.extractEntry(atPath: "/etc/passwd", to: dest)) { error in
-            guard case ZipReaderError.unsafeEntryPath = error else {
+            guard case ArchiveReaderError.unsafeEntryPath = error else {
                 return XCTFail("expected unsafeEntryPath, got \(error)")
             }
         }

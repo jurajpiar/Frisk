@@ -1,12 +1,6 @@
 import Foundation
 import ZIPFoundation
 
-enum ZipReaderError: Error {
-    case cannotOpen(URL)
-    case entryNotFound(String)
-    case unsafeEntryPath(String)
-}
-
 /// Reads a zip archive's central directory and extracts individual entries.
 /// Opening never inflates entry data; only `extractEntry(atPath:to:)` writes bytes.
 ///
@@ -16,16 +10,16 @@ struct ZipArchiveReader: ArchiveReading {
     let archiveURL: URL
 
     /// Lists entries by reading the central directory only — no data is inflated.
-    func listEntries() throws -> [ZipEntryItem] {
+    func listEntries() throws -> [ArchiveEntryItem] {
         let archive: Archive
         do {
             archive = try Archive(url: archiveURL, accessMode: .read)
         } catch {
             // Normalise any open/parse failure into a single, reportable error.
-            throw ZipReaderError.cannotOpen(archiveURL)
+            throw ArchiveReaderError.cannotOpen(archiveURL)
         }
         return archive.map { entry in
-            ZipEntryItem(
+            ArchiveEntryItem(
                 id: entry.path,
                 path: entry.path,
                 fileName: (entry.path as NSString).lastPathComponent,
@@ -42,11 +36,11 @@ struct ZipArchiveReader: ArchiveReading {
         // Zip-slip guard: reject traversal components in the entry path.
         let components = (path as NSString).pathComponents
         guard !components.contains(".."), !path.hasPrefix("/") else {
-            throw ZipReaderError.unsafeEntryPath(path)
+            throw ArchiveReaderError.unsafeEntryPath(path)
         }
         let archive = try Archive(url: archiveURL, accessMode: .read)
         guard let entry = archive[path] else {
-            throw ZipReaderError.entryNotFound(path)
+            throw ArchiveReaderError.entryNotFound(path)
         }
         _ = try archive.extract(entry, to: destinationURL)
     }

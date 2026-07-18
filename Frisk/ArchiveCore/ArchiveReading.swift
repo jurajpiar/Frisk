@@ -4,13 +4,16 @@ import Foundation
 /// Implemented by `ZipArchiveReader` (zip, via ZIPFoundation) and `CompressedArchiveReader`
 /// (tar/gzip/bzip2/xz/7z, via SWCompression).
 protocol ArchiveReading {
-    func listEntries() throws -> [ZipEntryItem]
+    func listEntries() throws -> [ArchiveEntryItem]
     func extractEntry(atPath path: String, to destinationURL: URL) throws
 }
 
 enum ArchiveReaderError: Error {
     case unsupportedFormat(String)
     case archiveTooLarge(UInt64)
+    case cannotOpen(URL)
+    case entryNotFound(String)
+    case unsafeEntryPath(String)
 }
 
 enum ArchiveReaders {

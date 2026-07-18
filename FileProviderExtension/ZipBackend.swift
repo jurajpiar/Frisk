@@ -1,14 +1,14 @@
 import Foundation
 
 /// Serves a real zip. Resolves the domain's security-scoped bookmark to the user's
-/// *original* zip (e.g. in Downloads), lists its central directory via ZipCore, and
+/// *original* zip (e.g. in Downloads), lists its central directory via ArchiveCore, and
 /// extracts single entries on demand for materialisation.
 final class ZipBackend: ProviderBackend {
     private let displayName: String
     private let zipURL: URL
     private let didStartAccess: Bool
     private let reader: ZipArchiveReader
-    private let entries: [ZipEntryItem]
+    private let entries: [ArchiveEntryItem]
 
     /// Diagnostics surfaced to the extension when the archive can't be read.
     let loadedCount: Int

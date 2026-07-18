@@ -19,12 +19,12 @@ final class InAppTextPreview {
     /// entries are refused rather than extracted, to avoid a zip-bomb DoS on spacebar.
     static let previewByteCap: UInt64 = 20 * 1024 * 1024   // 20 MB
 
-    static func isMarkdown(_ entry: ZipEntryItem) -> Bool {
+    static func isMarkdown(_ entry: ArchiveEntryItem) -> Bool {
         markdownExtensions.contains((entry.fileName as NSString).pathExtension.lowercased())
     }
 
     /// Safe to extract + preview: a plausibly-sized, not-too-large entry.
-    static func isPreviewable(_ entry: ZipEntryItem) -> Bool {
+    static func isPreviewable(_ entry: ArchiveEntryItem) -> Bool {
         entry.isSizeReliable && entry.uncompressedSize <= previewByteCap
     }
 

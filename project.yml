@@ -101,7 +101,7 @@ targets:
     deploymentTarget: "14.0"
     sources:
       - path: PreviewExtension
-      - path: Frisk/ZipCore
+      - path: Frisk/ArchiveCore
     dependencies:
       - package: ZIPFoundation
       - package: SWCompression
@@ -139,7 +139,7 @@ targets:
     deploymentTarget: "14.0"
     sources:
       - path: FileProviderExtension
-      - path: Frisk/ZipCore          # shared reader/model
+      - path: Frisk/ArchiveCore          # shared reader/model
     dependencies:
       - package: ZIPFoundation
       - package: SWCompression
@@ -158,7 +158,7 @@ targets:
         CFBundleDevelopmentRegion: en_GB
         NSExtension:
           NSExtensionPointIdentifier: com.apple.fileprovider-nonui
-          NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).ZipFileProviderExtension
+          NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).ArchiveFileProviderExtension
           NSExtensionFileProviderDocumentGroup: group.org.deadkittens.frisk
           NSExtensionFileProviderSupportsEnumeration: true
 

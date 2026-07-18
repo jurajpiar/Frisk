@@ -3,7 +3,7 @@ import Foundation
 /// A single entry within a zip archive, described from the central directory alone
 /// (no inflation of the entry's data). Shared by the app window and the Quick Look
 /// extension.
-struct ZipEntryItem: Identifiable, Hashable {
+struct ArchiveEntryItem: Identifiable, Hashable {
     let id: String          // entry path inside the archive
     let path: String        // same as id; full path within archive
     let fileName: String    // last path component
@@ -13,7 +13,7 @@ struct ZipEntryItem: Identifiable, Hashable {
     let modificationDate: Date?
 }
 
-extension ZipEntryItem {
+extension ArchiveEntryItem {
     /// Sizes at/above this are treated as unreadable rather than real. No single file in a
     /// hand-handled archive is a petabyte; values this large come from a corrupt/hostile
     /// central directory or a library mis-parse (e.g. ZIPFoundation returns garbage
@@ -29,7 +29,7 @@ extension ZipEntryItem {
 
     /// Overflow-safe total of the *reliably-sized* file entries (directories and
     /// implausible sizes excluded), clamped to `Int64.max`.
-    static func totalUncompressedByteCount(of entries: [ZipEntryItem]) -> Int64 {
+    static func totalUncompressedByteCount(of entries: [ArchiveEntryItem]) -> Int64 {
         var total: UInt64 = 0
         for entry in entries where !entry.isDirectory && entry.isSizeReliable {
             let (sum, overflow) = total.addingReportingOverflow(entry.uncompressedSize)
@@ -40,7 +40,7 @@ extension ZipEntryItem {
 
     /// True if any file entry has an implausible (unreadable) size — the total can't be
     /// trusted and should be omitted rather than shown wrong.
-    static func hasUnreliableSizes(in entries: [ZipEntryItem]) -> Bool {
+    static func hasUnreliableSizes(in entries: [ArchiveEntryItem]) -> Bool {
         entries.contains { !$0.isDirectory && !$0.isSizeReliable }
     }
 }
