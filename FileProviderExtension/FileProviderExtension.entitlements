@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<!-- File Provider extensions run sandboxed. -->
+	<key>com.apple.security.app-sandbox</key>
+	<true/>
+	<!-- Shared container with the host app: reads each domain's security-scoped
+	     bookmark to reach the source zip. -->
+	<key>com.apple.security.application-groups</key>
+	<array>
+		<string>group.org.deadkittens.ziplook</string>
+		<string>group.org.deadkittens.ziplook.share</string>
+	</array>
+	<!-- Resolve the app-scoped security-scoped bookmark to read the user's original zip. -->
+	<key>com.apple.security.files.bookmarks.app-scope</key>
+	<true/>
+</dict>
+</plist>

@@ -1,0 +1,154 @@
+name: ZipLook
+
+options:
+  bundleIdPrefix: org.deadkittens
+  deploymentTarget:
+    macOS: "14.0"
+  createIntermediateGroups: true
+
+# ZIPFoundation (D2) — pure-Swift zip reader, shared by the app and both extensions.
+packages:
+  ZIPFoundation:
+    url: https://github.com/weichsel/ZIPFoundation
+    from: "0.9.0"
+  # Apple's Markdown parser (cmark-gfm) — used to render rich markdown previews in-app.
+  swift-markdown:
+    url: https://github.com/swiftlang/swift-markdown
+    branch: main
+
+# Signing: DEVELOPMENT_TEAM is supplied by Config/Signing.xcconfig (git-ignored). Copy
+# Config/Signing.xcconfig.example → Config/Signing.xcconfig and set your Apple Development
+# Team ID. Automatic signing; a free personal team is sufficient (no paid membership).
+configFiles:
+  Debug: Config/Signing.xcconfig
+  Release: Config/Signing.xcconfig
+
+targets:
+  ZipLook:
+    type: application
+    platform: macOS
+    deploymentTarget: "14.0"
+    sources:
+      - path: ZipLook
+    dependencies:
+      - package: ZIPFoundation
+      - package: swift-markdown
+        product: Markdown
+      - target: PreviewExtension       # Quick Look preview appex (stage 05)
+      # File Provider appex (stage 07) is blocked by an extension sandbox limit on this
+      # setup (see 07_file_provider/outputs/STATUS.md) — not embedded in the v1 app.
+      # - target: FileProviderExtension
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: org.deadkittens.ZipLook
+        MARKETING_VERSION: "1.0"
+        CURRENT_PROJECT_VERSION: "1"
+        SWIFT_VERSION: "5.0"
+        CODE_SIGN_ENTITLEMENTS: ZipLook/ZipLook.entitlements
+        CODE_SIGN_STYLE: Automatic
+        DEVELOPMENT_LANGUAGE: en-GB
+    info:
+      path: ZipLook/Info.plist
+      properties:
+        CFBundleDisplayName: ZipLook
+        CFBundleDevelopmentRegion: en_GB
+        LSApplicationCategoryType: public.app-category.utilities
+        CFBundleDocumentTypes:
+          - CFBundleTypeName: Zip Archive
+            CFBundleTypeRole: Viewer
+            LSHandlerRank: Alternate
+            LSItemContentTypes:
+              - public.zip-archive
+
+  PreviewExtension:
+    type: app-extension
+    platform: macOS
+    deploymentTarget: "14.0"
+    sources:
+      - path: PreviewExtension
+      - path: ZipLook/ZipCore
+    dependencies:
+      - package: ZIPFoundation
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: org.deadkittens.ZipLook.PreviewExtension  # D9
+        MARKETING_VERSION: "1.0"
+        CURRENT_PROJECT_VERSION: "1"
+        SWIFT_VERSION: "5.0"
+        CODE_SIGN_ENTITLEMENTS: PreviewExtension/PreviewExtension.entitlements
+        CODE_SIGN_STYLE: Automatic
+    info:
+      path: PreviewExtension/Info.plist
+      properties:
+        CFBundleDisplayName: ZipLook Preview
+        CFBundleDevelopmentRegion: en_GB
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.quicklook.preview
+          NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).PreviewProvider
+          NSExtensionAttributes:
+            QLIsDataBasedPreview: true
+            QLSupportedContentTypes:
+              - public.zip-archive
+              - com.pkware.zip-archive
+
+  FileProviderExtension:
+    type: app-extension
+    platform: macOS
+    deploymentTarget: "14.0"
+    sources:
+      - path: FileProviderExtension
+      - path: ZipLook/ZipCore          # shared reader/model
+    dependencies:
+      - package: ZIPFoundation
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: org.deadkittens.ZipLook.FileProvider  # prefixed by host (D9)
+        MARKETING_VERSION: "1.0"
+        CURRENT_PROJECT_VERSION: "1"
+        SWIFT_VERSION: "5.0"
+        CODE_SIGN_ENTITLEMENTS: FileProviderExtension/FileProviderExtension.entitlements
+        CODE_SIGN_STYLE: Automatic
+    info:
+      path: FileProviderExtension/Info.plist
+      properties:
+        CFBundleDisplayName: ZipLook File Provider
+        CFBundleDevelopmentRegion: en_GB
+        NSExtension:
+          NSExtensionPointIdentifier: com.apple.fileprovider-nonui
+          NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).ZipFileProviderExtension
+          NSExtensionFileProviderDocumentGroup: group.org.deadkittens.ziplook
+          NSExtensionFileProviderSupportsEnumeration: true
+
+  ZipLookTests:
+    type: bundle.unit-test
+    platform: macOS
+    deploymentTarget: "14.0"
+    sources:
+      - path: ZipLookTests
+    dependencies:
+      - target: ZipLook
+      - package: ZIPFoundation
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: org.deadkittens.ZipLookTests
+        GENERATE_INFOPLIST_FILE: "YES"
+        SWIFT_VERSION: "5.0"
+        CODE_SIGN_STYLE: Automatic
+
+schemes:
+  ZipLook:
+    build:
+      targets:
+        ZipLook: all
+    run:
+      config: Debug
+    test:
+      config: Debug
+      targets:
+        - ZipLookTests
+    profile:
+      config: Release
+    analyze:
+      config: Debug
+    archive:
+      config: Release

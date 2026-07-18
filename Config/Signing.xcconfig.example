@@ -1,0 +1,5 @@
+// Copy this file to Config/Signing.xcconfig (which is git-ignored) and set your own
+// Apple Development Team ID. Find it in Xcode ▸ Settings ▸ Accounts (team details),
+// or run:  security find-identity -v -p codesigning
+// A free personal Apple ID team works — no paid Developer Program membership needed.
+DEVELOPMENT_TEAM = YOUR_TEAM_ID
