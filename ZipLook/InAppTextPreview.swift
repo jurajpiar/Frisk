@@ -15,8 +15,17 @@ final class InAppTextPreview {
 
     private static let markdownExtensions: Set<String> = ["md", "markdown", "mdown", "markdn", "mkd"]
 
+    /// Largest markdown entry we'll extract + render in-app. Bigger (or unreadable-size)
+    /// entries are refused rather than extracted, to avoid a zip-bomb DoS on spacebar.
+    static let previewByteCap: UInt64 = 20 * 1024 * 1024   // 20 MB
+
     static func isMarkdown(_ entry: ZipEntryItem) -> Bool {
         markdownExtensions.contains((entry.fileName as NSString).pathExtension.lowercased())
+    }
+
+    /// Safe to extract + preview: a plausibly-sized, not-too-large entry.
+    static func isPreviewable(_ entry: ZipEntryItem) -> Bool {
+        entry.isSizeReliable && entry.uncompressedSize <= previewByteCap
     }
 
     var isVisible: Bool { window?.isVisible == true }
@@ -25,7 +34,7 @@ final class InAppTextPreview {
     /// Show (or update) the preview for a markdown entry. `fileURL` is the extracted temp
     /// file (for the "Open with…" button); `navigationTable` receives forwarded arrow keys
     /// so entries can be navigated like the system Quick Look panel.
-    func show(title: String, markdown content: String, fileURL: URL, navigationTable: NSTableView?) {
+    func show(title: String, markdown content: String, fileURL: URL?, navigationTable: NSTableView?) {
         self.navigationTable = navigationTable
         installKeyMonitorIfNeeded()
         if window == nil {
@@ -62,13 +71,15 @@ final class InAppTextPreview {
 
 private struct MarkdownPreviewView: View {
     let markdown: String
-    let fileURL: URL
+    let fileURL: URL?   // nil when the entry was refused (too large / unreadable size)
 
     var body: some View {
         VStack(spacing: 0) {
             HStack {
                 Spacer()
-                Button(openTitle) { NSWorkspace.shared.open(fileURL) }
+                if let fileURL {
+                    Button(openTitle(fileURL)) { NSWorkspace.shared.open(fileURL) }
+                }
             }
             .padding(8)
             Divider()
@@ -78,8 +89,8 @@ private struct MarkdownPreviewView: View {
     }
 
     /// "Open with <DefaultApp>", matching the system Quick Look panel.
-    private var openTitle: String {
-        if let appURL = NSWorkspace.shared.urlForApplication(toOpen: fileURL) {
+    private func openTitle(_ url: URL) -> String {
+        if let appURL = NSWorkspace.shared.urlForApplication(toOpen: url) {
             let name = FileManager.default.displayName(atPath: appURL.path)
                 .replacingOccurrences(of: ".app", with: "")
             return "Open with \(name)"
@@ -98,6 +109,7 @@ private struct MarkdownWebView: NSViewRepresentable {
 
     func makeNSView(context: Context) -> WKWebView {
         let webView = WKWebView(frame: .zero, configuration: WKWebViewConfiguration())
+        webView.navigationDelegate = context.coordinator
         context.coordinator.load(bodyHTML, into: webView)
         return webView
     }
@@ -106,12 +118,51 @@ private struct MarkdownWebView: NSViewRepresentable {
         context.coordinator.load(bodyHTML, into: webView)
     }
 
-    final class Coordinator: NSObject {
+    final class Coordinator: NSObject, WKNavigationDelegate {
         private var lastLoaded: String?
+        private var ruleAdded = false
+        private static var cachedRule: WKContentRuleList?
+
         func load(_ body: String, into webView: WKWebView) {
             guard body != lastLoaded else { return }   // avoid redundant reloads
             lastLoaded = body
-            webView.loadHTMLString(MarkdownDocument.html(body: body), baseURL: nil)
+            // Block ALL network in the preview before rendering: untrusted markdown must not
+            // fetch remote images/trackers (the app has network.client only so WKWebView runs).
+            ensureBlockingRule(on: webView) { [weak self] in
+                webView.loadHTMLString(MarkdownDocument.html(body: body), baseURL: nil)
+                _ = self
+            }
+        }
+
+        private func ensureBlockingRule(on webView: WKWebView, then: @escaping () -> Void) {
+            if ruleAdded { then(); return }
+            let add: (WKContentRuleList) -> Void = { rule in
+                webView.configuration.userContentController.add(rule)
+                self.ruleAdded = true
+                then()
+            }
+            if let rule = Self.cachedRule { add(rule); return }
+            // Block remote (http/https) loads only — inline/local/data content still renders.
+            let json = #"[{"trigger":{"url-filter":"^https?://"},"action":{"type":"block"}}]"#
+            guard let store = WKContentRuleListStore.default() else { then(); return }
+            store.compileContentRuleList(forIdentifier: "ziplook-block-all",
+                                         encodedContentRuleList: json) { list, _ in
+                if let list { Self.cachedRule = list; add(list) } else { then() }
+            }
+        }
+
+        // Open link clicks in the default browser; block any in-preview navigation.
+        func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction,
+                     decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+            if navigationAction.navigationType == .other {
+                decisionHandler(.allow)                    // our own loadHTMLString
+            } else {
+                if let url = navigationAction.request.url,
+                   let scheme = url.scheme?.lowercased(), scheme == "http" || scheme == "https" {
+                    NSWorkspace.shared.open(url)
+                }
+                decisionHandler(.cancel)
+            }
         }
     }
 }

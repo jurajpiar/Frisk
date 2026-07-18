@@ -92,4 +92,16 @@ final class HardeningTests: XCTestCase {
         XCTAssertTrue(html.contains("some sizes unavailable"))
         XCTAssertFalse(html.contains(" total"), "no fabricated total when sizes are garbage")
     }
+
+    // MARK: - Preview size cap (zip-bomb DoS guard)
+
+    func testPreviewSizeCap() {
+        func md(_ size: UInt64) -> ZipEntryItem {
+            ZipEntryItem(id: "x", path: "x", fileName: "x.md", isDirectory: false,
+                         uncompressedSize: size, compressedSize: 1, modificationDate: nil)
+        }
+        XCTAssertTrue(InAppTextPreview.isPreviewable(md(1_000)))                // small → ok
+        XCTAssertFalse(InAppTextPreview.isPreviewable(md(100 * 1024 * 1024)))   // 100 MB → refused
+        XCTAssertFalse(InAppTextPreview.isPreviewable(huge("g")))              // unreadable size → refused
+    }
 }

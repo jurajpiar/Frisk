@@ -252,6 +252,17 @@ final class QuickLookTableView: NSTableView {
         let files = controller.selectedFiles()
         if files.count == 1, let entry = files.first, InAppTextPreview.isMarkdown(entry) {
             if QLPreviewPanel.sharedPreviewPanelExists() { QLPreviewPanel.shared()?.orderOut(nil) }
+            // Refuse to extract oversized / unreadable-size entries (zip-bomb DoS guard);
+            // show a message instead of the content.
+            guard InAppTextPreview.isPreviewable(entry) else {
+                let reason = entry.isSizeReliable
+                    ? "This file is too large to preview here."
+                    : "This file's size can't be read reliably, so it isn't previewed."
+                let message = "# \(entry.fileName)\n\n\(reason)\n\nDrag it out to Finder to open it."
+                InAppTextPreview.shared.show(title: entry.fileName, markdown: message,
+                                             fileURL: nil, navigationTable: self)
+                return
+            }
             if let url = controller.extractedURL(for: entry),
                let content = try? String(contentsOf: url, encoding: .utf8) {
                 InAppTextPreview.shared.show(title: entry.fileName, markdown: content,
