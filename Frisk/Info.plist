@@ -5,7 +5,7 @@
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en_GB</string>
 	<key>CFBundleDisplayName</key>
-	<string>ZipLook</string>
+	<string>Frisk</string>
 	<key>CFBundleDocumentTypes</key>
 	<array>
 		<dict>

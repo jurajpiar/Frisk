@@ -1,4 +1,4 @@
-# ZipLook
+# Frisk
 
 A tiny sandboxed macOS tool for peeking inside archives without extracting them.
 
@@ -23,7 +23,7 @@ brew install xcodegen        # once
 cp Config/Signing.xcconfig.example Config/Signing.xcconfig
 # edit Config/Signing.xcconfig and set DEVELOPMENT_TEAM to your Apple Development Team ID
 xcodegen generate
-open ZipLook.xcodeproj        # or: xcodebuild -scheme ZipLook build
+open Frisk.xcodeproj        # or: xcodebuild -scheme Frisk build
 ```
 
 A free personal Apple ID team is sufficient (no paid Developer Program membership).

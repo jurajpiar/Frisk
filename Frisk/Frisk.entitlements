@@ -22,8 +22,8 @@
 	     security-scoped bookmark of each opened zip, keyed by domain identifier. -->
 	<key>com.apple.security.application-groups</key>
 	<array>
-		<string>group.org.deadkittens.ziplook</string>
-		<string>group.org.deadkittens.ziplook.share</string>
+		<string>group.org.deadkittens.frisk</string>
+		<string>group.org.deadkittens.frisk.share</string>
 	</array>
 </dict>
 </plist>

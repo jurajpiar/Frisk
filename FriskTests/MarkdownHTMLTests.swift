@@ -1,5 +1,5 @@
 import XCTest
-@testable import ZipLook
+@testable import Frisk
 
 /// The swift-markdown → HTML emitter: rich constructs render, mermaid blocks are tagged
 /// for mermaid.js, and text is HTML-escaped (no injection).

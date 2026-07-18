@@ -13,7 +13,7 @@ protocol ProviderBackend {
 /// the mount (since os_log isn't visible here). Temporary, for M3 debugging.
 struct DiagnosticBackend: ProviderBackend {
     let reason: String
-    func rootName() -> String { "ZipLook DIAG" }
+    func rootName() -> String { "Frisk DIAG" }
     func files() -> [FPFile] { [FPFile(path: "DIAG--\(reason).txt", size: Int64(reason.utf8.count))] }
     func extract(entryPath: String) throws -> URL {
         let dir = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString, isDirectory: true)
@@ -26,7 +26,7 @@ struct DiagnosticBackend: ProviderBackend {
 
 /// M2: a fixed tree used to prove enumeration + materialisation work end-to-end.
 struct StaticBackend: ProviderBackend {
-    func rootName() -> String { "ZipLook Static" }
+    func rootName() -> String { "Frisk Static" }
 
     func files() -> [FPFile] {
         [FPFile(path: "readme.txt", size: 14),
@@ -36,7 +36,7 @@ struct StaticBackend: ProviderBackend {
 
     func extract(entryPath: String) throws -> URL {
         let contents: [String: String] = [
-            "readme.txt": "Hello ZipLook\n",
+            "readme.txt": "Hello Frisk\n",
             "docs/notes.md": "nested file\n",
             "docs/deep/inner.txt": "inner\n"
         ]

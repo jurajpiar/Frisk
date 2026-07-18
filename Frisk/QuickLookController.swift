@@ -22,7 +22,7 @@ final class QuickLookController: NSObject, QLPreviewPanelDataSource, QLPreviewPa
         self.archiveURL = archiveURL
         self.reader = ArchiveReaders.reader(for: archiveURL)
         self.tempRoot = FileManager.default.temporaryDirectory
-            .appendingPathComponent("ZipLookQL-\(UUID().uuidString)", isDirectory: true)
+            .appendingPathComponent("FriskQL-\(UUID().uuidString)", isDirectory: true)
         super.init()
     }
 

@@ -1,6 +1,6 @@
 import XCTest
 import SWCompression
-@testable import ZipLook
+@testable import Frisk
 
 /// Exercises the SWCompression-backed reader for the non-zip formats. Fixtures are built
 /// in-process with SWCompression itself (no external CLI tools), so the tests are
@@ -9,7 +9,7 @@ final class CompressedArchiveReaderTests: XCTestCase {
 
     private var tempDir: URL!
 
-    private let firstData = Data("Hello, ZipLook!\n".utf8)
+    private let firstData = Data("Hello, Frisk!\n".utf8)
     private let secondData = Data((0..<512).map { UInt8($0 & 0xFF) })
 
     override func setUpWithError() throws {

@@ -8,7 +8,7 @@ struct ContentView: View {
     var body: some View {
         content
             .frame(minWidth: 520, minHeight: 360)
-            .navigationTitle(store.archiveURL?.lastPathComponent ?? "ZipLook")
+            .navigationTitle(store.archiveURL?.lastPathComponent ?? "Frisk")
     }
 
     @ViewBuilder
@@ -37,7 +37,7 @@ struct ContentView: View {
                 .foregroundStyle(.secondary)
             Text("Open a zip archive")
                 .font(.title2)
-            Text("Choose File \u{203A} Open\u{2026} (\u{2318}O), or open a .zip with ZipLook from Finder.")
+            Text("Choose File \u{203A} Open\u{2026} (\u{2318}O), or open a .zip with Frisk from Finder.")
                 .font(.callout)
                 .foregroundStyle(.secondary)
                 .multilineTextAlignment(.center)

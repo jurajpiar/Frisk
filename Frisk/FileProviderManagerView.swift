@@ -9,7 +9,7 @@ struct FileProviderManagerView: View {
         VStack(alignment: .leading, spacing: 12) {
             HStack {
                 VStack(alignment: .leading) {
-                    Text("ZipLook").font(.title2).bold()
+                    Text("Frisk").font(.title2).bold()
                     Text("Mount a zip to browse it in Finder — preview and drag entries out natively.")
                         .font(.callout).foregroundStyle(.secondary)
                 }

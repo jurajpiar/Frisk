@@ -11,7 +11,7 @@ final class ZipFilePromiseDelegate: NSObject, NSFilePromiseProviderDelegate {
     /// Serial background queue that the system uses to fulfil promise writes.
     private let workQueue: OperationQueue = {
         let queue = OperationQueue()
-        queue.name = "org.deadkittens.ZipLook.promiseWrites"
+        queue.name = "org.deadkittens.Frisk.promiseWrites"
         queue.maxConcurrentOperationCount = 1
         queue.qualityOfService = .userInitiated
         return queue
@@ -77,9 +77,9 @@ final class ZipFilePromiseDelegate: NSObject, NSFilePromiseProviderDelegate {
         // entry usually surfaces as "not found" at extraction time.
         if case ZipReaderError.entryNotFound = error {
             return "This entry could not be read. If the archive is encrypted, note that "
-                 + "ZipLook cannot extract password-protected entries yet."
+                 + "Frisk cannot extract password-protected entries yet."
         }
-        return "ZipLook could not extract this entry.\n\n\(error.localizedDescription)"
+        return "Frisk could not extract this entry.\n\n\(error.localizedDescription)"
     }
 
     func operationQueue(for filePromiseProvider: NSFilePromiseProvider) -> OperationQueue {

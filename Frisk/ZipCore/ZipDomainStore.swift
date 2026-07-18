@@ -7,7 +7,7 @@ import Foundation
 /// UserDefaults writes.
 enum ZipDomainStore {
     /// Dedicated sharing group — separate from the FP-managed document group.
-    static let appGroupID = "group.org.deadkittens.ziplook.share"
+    static let appGroupID = "group.org.deadkittens.frisk.share"
 
     static func containerURL() -> URL? {
         FileManager.default.containerURL(forSecurityApplicationGroupIdentifier: appGroupID)

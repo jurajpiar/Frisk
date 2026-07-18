@@ -1,5 +1,5 @@
 import XCTest
-@testable import ZipLook
+@testable import Frisk
 
 /// Stage 05: the HTML listing must escape attacker-controlled entry names and cap rows.
 final class PreviewHTMLTests: XCTestCase {

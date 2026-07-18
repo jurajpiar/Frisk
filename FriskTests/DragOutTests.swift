@@ -2,7 +2,7 @@ import XCTest
 import AppKit
 import UniformTypeIdentifiers
 import ZIPFoundation
-@testable import ZipLook
+@testable import Frisk
 
 /// Stage 04 invariants that can be checked without a live drag gesture. The actual
 /// drag/drop, Esc-cancel and large-file responsiveness are the human gate.

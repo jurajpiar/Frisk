@@ -1,6 +1,6 @@
 import XCTest
 import ZIPFoundation
-@testable import ZipLook
+@testable import Frisk
 
 final class ZipCoreTests: XCTestCase {
 
@@ -8,7 +8,7 @@ final class ZipCoreTests: XCTestCase {
     private var archiveURL: URL!
 
     // Known fixture payloads.
-    private let firstData = Data("Hello, ZipLook!\n".utf8)
+    private let firstData = Data("Hello, Frisk!\n".utf8)
     private let secondData = Data((0..<512).map { UInt8($0 & 0xFF) })  // 512 bytes
 
     override func setUpWithError() throws {

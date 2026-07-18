@@ -145,7 +145,7 @@ private struct MarkdownWebView: NSViewRepresentable {
             // Block remote (http/https) loads only — inline/local/data content still renders.
             let json = #"[{"trigger":{"url-filter":"^https?://"},"action":{"type":"block"}}]"#
             guard let store = WKContentRuleListStore.default() else { then(); return }
-            store.compileContentRuleList(forIdentifier: "ziplook-block-all",
+            store.compileContentRuleList(forIdentifier: "frisk-block-all",
                                          encodedContentRuleList: json) { list, _ in
                 if let list { Self.cachedRule = list; add(list) } else { then() }
             }

@@ -1,7 +1,7 @@
 import XCTest
 import AppKit
 import ZIPFoundation
-@testable import ZipLook
+@testable import Frisk
 
 /// Stage 06 checks that are self-contained (build the fixture in the sandbox temp dir).
 /// Encrypted / non-UTF-8 / Zip64 archives are exercised via app-launch fixtures instead,

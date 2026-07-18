@@ -1,4 +1,4 @@
-name: ZipLook
+name: Frisk
 
 options:
   bundleIdPrefix: org.deadkittens
@@ -28,12 +28,12 @@ configFiles:
   Release: Config/Signing.xcconfig
 
 targets:
-  ZipLook:
+  Frisk:
     type: application
     platform: macOS
     deploymentTarget: "14.0"
     sources:
-      - path: ZipLook
+      - path: Frisk
     dependencies:
       - package: ZIPFoundation
       - package: SWCompression
@@ -45,17 +45,17 @@ targets:
       # - target: FileProviderExtension
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: org.deadkittens.ZipLook
+        PRODUCT_BUNDLE_IDENTIFIER: org.deadkittens.Frisk
         MARKETING_VERSION: "1.0"
         CURRENT_PROJECT_VERSION: "1"
         SWIFT_VERSION: "5.0"
-        CODE_SIGN_ENTITLEMENTS: ZipLook/ZipLook.entitlements
+        CODE_SIGN_ENTITLEMENTS: Frisk/Frisk.entitlements
         CODE_SIGN_STYLE: Automatic
         DEVELOPMENT_LANGUAGE: en-GB
     info:
-      path: ZipLook/Info.plist
+      path: Frisk/Info.plist
       properties:
-        CFBundleDisplayName: ZipLook
+        CFBundleDisplayName: Frisk
         CFBundleDevelopmentRegion: en_GB
         LSApplicationCategoryType: public.app-category.utilities
         CFBundleDocumentTypes:
@@ -101,13 +101,13 @@ targets:
     deploymentTarget: "14.0"
     sources:
       - path: PreviewExtension
-      - path: ZipLook/ZipCore
+      - path: Frisk/ZipCore
     dependencies:
       - package: ZIPFoundation
       - package: SWCompression
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: org.deadkittens.ZipLook.PreviewExtension  # D9
+        PRODUCT_BUNDLE_IDENTIFIER: org.deadkittens.Frisk.PreviewExtension  # D9
         MARKETING_VERSION: "1.0"
         CURRENT_PROJECT_VERSION: "1"
         SWIFT_VERSION: "5.0"
@@ -116,7 +116,7 @@ targets:
     info:
       path: PreviewExtension/Info.plist
       properties:
-        CFBundleDisplayName: ZipLook Preview
+        CFBundleDisplayName: Frisk Preview
         CFBundleDevelopmentRegion: en_GB
         NSExtension:
           NSExtensionPointIdentifier: com.apple.quicklook.preview
@@ -139,13 +139,13 @@ targets:
     deploymentTarget: "14.0"
     sources:
       - path: FileProviderExtension
-      - path: ZipLook/ZipCore          # shared reader/model
+      - path: Frisk/ZipCore          # shared reader/model
     dependencies:
       - package: ZIPFoundation
       - package: SWCompression
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: org.deadkittens.ZipLook.FileProvider  # prefixed by host (D9)
+        PRODUCT_BUNDLE_IDENTIFIER: org.deadkittens.Frisk.FileProvider  # prefixed by host (D9)
         MARKETING_VERSION: "1.0"
         CURRENT_PROJECT_VERSION: "1"
         SWIFT_VERSION: "5.0"
@@ -154,42 +154,42 @@ targets:
     info:
       path: FileProviderExtension/Info.plist
       properties:
-        CFBundleDisplayName: ZipLook File Provider
+        CFBundleDisplayName: Frisk File Provider
         CFBundleDevelopmentRegion: en_GB
         NSExtension:
           NSExtensionPointIdentifier: com.apple.fileprovider-nonui
           NSExtensionPrincipalClass: $(PRODUCT_MODULE_NAME).ZipFileProviderExtension
-          NSExtensionFileProviderDocumentGroup: group.org.deadkittens.ziplook
+          NSExtensionFileProviderDocumentGroup: group.org.deadkittens.frisk
           NSExtensionFileProviderSupportsEnumeration: true
 
-  ZipLookTests:
+  FriskTests:
     type: bundle.unit-test
     platform: macOS
     deploymentTarget: "14.0"
     sources:
-      - path: ZipLookTests
+      - path: FriskTests
     dependencies:
-      - target: ZipLook
+      - target: Frisk
       - package: ZIPFoundation
       - package: SWCompression
     settings:
       base:
-        PRODUCT_BUNDLE_IDENTIFIER: org.deadkittens.ZipLookTests
+        PRODUCT_BUNDLE_IDENTIFIER: org.deadkittens.FriskTests
         GENERATE_INFOPLIST_FILE: "YES"
         SWIFT_VERSION: "5.0"
         CODE_SIGN_STYLE: Automatic
 
 schemes:
-  ZipLook:
+  Frisk:
     build:
       targets:
-        ZipLook: all
+        Frisk: all
     run:
       config: Debug
     test:
       config: Debug
       targets:
-        - ZipLookTests
+        - FriskTests
     profile:
       config: Release
     analyze:

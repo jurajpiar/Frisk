@@ -9,8 +9,8 @@
 	     bookmark to reach the source zip. -->
 	<key>com.apple.security.application-groups</key>
 	<array>
-		<string>group.org.deadkittens.ziplook</string>
-		<string>group.org.deadkittens.ziplook.share</string>
+		<string>group.org.deadkittens.frisk</string>
+		<string>group.org.deadkittens.frisk.share</string>
 	</array>
 	<!-- Resolve the app-scoped security-scoped bookmark to read the user's original zip. -->
 	<key>com.apple.security.files.bookmarks.app-scope</key>

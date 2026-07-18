@@ -1,6 +1,6 @@
 import XCTest
 import ZIPFoundation
-@testable import ZipLook
+@testable import Frisk
 
 /// In-app Quick Look: the controller must extract only file entries and reproduce their
 /// bytes at the temp URL handed to the preview panel.

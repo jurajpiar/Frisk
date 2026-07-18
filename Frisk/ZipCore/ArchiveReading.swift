@@ -24,7 +24,7 @@ enum ArchiveReaders {
         ".tar", ".7z", ".gz", ".bz2", ".xz"
     ]
 
-    /// All archive filename extensions ZipLook can open (zip + the above).
+    /// All archive filename extensions Frisk can open (zip + the above).
     static func isSupportedArchive(_ url: URL) -> Bool {
         let name = url.lastPathComponent.lowercased()
         return name.hasSuffix(".zip") || compressedExtensions.contains { name.hasSuffix($0) }

@@ -2,7 +2,7 @@ import Foundation
 import FileProvider
 import os
 
-let fpLog = Logger(subsystem: "org.deadkittens.ZipLook.FileProvider", category: "fp")
+let fpLog = Logger(subsystem: "org.deadkittens.Frisk.FileProvider", category: "fp")
 
 /// Read-only `NSFileProviderReplicatedExtension` that presents an archive as a file tree.
 /// M2 uses `StaticBackend` to prove enumeration/materialisation; M3 swaps in a zip backend.

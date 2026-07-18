@@ -4,7 +4,7 @@ import SwiftUI
 /// in-app table; entries drag out to Finder and preview in-app (spacebar). A separate
 /// Quick Look preview extension handles glancing at a zip in Finder.
 @main
-struct ZipLookApp: App {
+struct FriskApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @StateObject private var store = ArchiveStore.shared
 
@@ -20,13 +20,13 @@ struct ZipLookApp: App {
                     .keyboardShortcut("o", modifiers: .command)
             }
             CommandGroup(replacing: .appInfo) {
-                Button("About ZipLook") { AppDelegate.showAboutPanel() }
+                Button("About Frisk") { AppDelegate.showAboutPanel() }
             }
         }
     }
 }
 
-/// Handles `open` Apple Events (double-click / Open With -> ZipLook in Finder).
+/// Handles `open` Apple Events (double-click / Open With -> Frisk in Finder).
 final class AppDelegate: NSObject, NSApplicationDelegate {
     func application(_ application: NSApplication, open urls: [URL]) {
         if let url = urls.first {
