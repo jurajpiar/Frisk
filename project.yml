@@ -15,6 +15,10 @@ packages:
   swift-markdown:
     url: https://github.com/swiftlang/swift-markdown
     branch: main
+  # Pure-Swift readers for non-zip archives (tar, gzip, bzip2, xz, 7z).
+  SWCompression:
+    url: https://github.com/tsolomko/SWCompression
+    from: "4.8.0"
 
 # Signing: DEVELOPMENT_TEAM is supplied by Config/Signing.xcconfig (git-ignored). Copy
 # Config/Signing.xcconfig.example → Config/Signing.xcconfig and set your Apple Development
@@ -32,6 +36,7 @@ targets:
       - path: ZipLook
     dependencies:
       - package: ZIPFoundation
+      - package: SWCompression
       - package: swift-markdown
         product: Markdown
       - target: PreviewExtension       # Quick Look preview appex (stage 05)
@@ -54,11 +59,41 @@ targets:
         CFBundleDevelopmentRegion: en_GB
         LSApplicationCategoryType: public.app-category.utilities
         CFBundleDocumentTypes:
-          - CFBundleTypeName: Zip Archive
+          - CFBundleTypeName: Archive
             CFBundleTypeRole: Viewer
             LSHandlerRank: Alternate
             LSItemContentTypes:
               - public.zip-archive
+              - org.gnu.gnu-zip-archive
+              - org.gnu.gnu-zip-tar-archive
+              - public.bzip2-archive
+              - public.tar-archive
+              - org.7-zip.7-zip-archive
+              - org.tukaani.xz-archive
+        UTImportedTypeDeclarations:
+          - UTTypeIdentifier: org.7-zip.7-zip-archive
+            UTTypeDescription: 7-Zip Archive
+            UTTypeConformsTo:
+              - public.data
+              - public.archive
+            UTTypeTagSpecification:
+              public.filename-extension:
+                - 7z
+          - UTTypeIdentifier: org.tukaani.xz-archive
+            UTTypeDescription: XZ Archive
+            UTTypeConformsTo:
+              - public.data
+            UTTypeTagSpecification:
+              public.filename-extension:
+                - xz
+          - UTTypeIdentifier: org.gnu.gnu-zip-tar-archive
+            UTTypeDescription: Gzip Tar Archive
+            UTTypeConformsTo:
+              - org.gnu.gnu-zip-archive
+            UTTypeTagSpecification:
+              public.filename-extension:
+                - tgz
+                - tar.gz
 
   PreviewExtension:
     type: app-extension
@@ -69,6 +104,7 @@ targets:
       - path: ZipLook/ZipCore
     dependencies:
       - package: ZIPFoundation
+      - package: SWCompression
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: org.deadkittens.ZipLook.PreviewExtension  # D9
@@ -90,6 +126,12 @@ targets:
             QLSupportedContentTypes:
               - public.zip-archive
               - com.pkware.zip-archive
+              - org.gnu.gnu-zip-archive
+              - org.gnu.gnu-zip-tar-archive
+              - public.bzip2-archive
+              - public.tar-archive
+              - org.7-zip.7-zip-archive
+              - org.tukaani.xz-archive
 
   FileProviderExtension:
     type: app-extension
@@ -100,6 +142,7 @@ targets:
       - path: ZipLook/ZipCore          # shared reader/model
     dependencies:
       - package: ZIPFoundation
+      - package: SWCompression
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: org.deadkittens.ZipLook.FileProvider  # prefixed by host (D9)
@@ -128,6 +171,7 @@ targets:
     dependencies:
       - target: ZipLook
       - package: ZIPFoundation
+      - package: SWCompression
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: org.deadkittens.ZipLookTests

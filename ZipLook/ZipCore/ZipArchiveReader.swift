@@ -12,7 +12,7 @@ enum ZipReaderError: Error {
 ///
 /// Adapted to ZIPFoundation 0.9.20: `Archive(url:accessMode:)` is a *throwing*
 /// initialiser, and `Entry.uncompressedSize` / `compressedSize` are already `UInt64`.
-struct ZipArchiveReader {
+struct ZipArchiveReader: ArchiveReading {
     let archiveURL: URL
 
     /// Lists entries by reading the central directory only — no data is inflated.

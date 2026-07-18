@@ -30,6 +30,12 @@
 			<array>
 				<string>public.zip-archive</string>
 				<string>com.pkware.zip-archive</string>
+				<string>org.gnu.gnu-zip-archive</string>
+				<string>org.gnu.gnu-zip-tar-archive</string>
+				<string>public.bzip2-archive</string>
+				<string>public.tar-archive</string>
+				<string>org.7-zip.7-zip-archive</string>
+				<string>org.tukaani.xz-archive</string>
 			</array>
 		</dict>
 		<key>NSExtensionPointIdentifier</key>

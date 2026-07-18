@@ -22,10 +22,19 @@ final class ArchiveStore: ObservableObject {
 
     private init() {}
 
-    /// Present an open panel restricted to zip archives (user-selected read grant, D7).
+    /// Archive types the Open panel accepts (zip + the SWCompression-backed formats).
+    static let openableContentTypes: [UTType] = {
+        var types: [UTType] = [.zip]
+        for ext in ["tar", "gz", "tgz", "bz2", "tbz", "tbz2", "xz", "txz", "7z"] {
+            if let type = UTType(filenameExtension: ext) { types.append(type) }
+        }
+        return types
+    }()
+
+    /// Present an open panel restricted to supported archives (user-selected read grant, D7).
     func presentOpenPanel() {
         let panel = NSOpenPanel()
-        panel.allowedContentTypes = [.zip]
+        panel.allowedContentTypes = Self.openableContentTypes
         panel.allowsMultipleSelection = false
         panel.canChooseDirectories = false
         panel.canChooseFiles = true
@@ -49,7 +58,7 @@ final class ArchiveStore: ObservableObject {
     private nonisolated static func load(_ url: URL) async -> LoadState {
         let didAccess = url.startAccessingSecurityScopedResource()
         defer { if didAccess { url.stopAccessingSecurityScopedResource() } }
-        let reader = ZipArchiveReader(archiveURL: url)
+        let reader = ArchiveReaders.reader(for: url)
         do {
             let entries = try reader.listEntries()
             return .loaded(entries)

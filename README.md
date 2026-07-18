@@ -1,15 +1,18 @@
 # ZipLook
 
-A tiny sandboxed macOS tool for peeking inside `.zip` archives without extracting them.
+A tiny sandboxed macOS tool for peeking inside archives without extracting them.
 
-- **Browse** a zip's entries in a window (name / size / modified).
+Supported formats: `.zip`, `.tar`, `.tar.gz`/`.tgz`, `.tar.bz2`/`.tbz`, `.tar.xz`/`.txz`,
+`.gz`, `.bz2`, `.xz`, and `.7z`.
+
+- **Browse** an archive's entries in a window (name / size / modified).
 - **Drag** any entry out to Finder to extract *just that entry* at the drop point — nothing
   is extracted until the drop lands, and cancelled drags write nothing.
 - **Preview** entries with the spacebar: the system Quick Look panel for most types, and a
   built-in renderer for **Markdown** (rendered via Apple's swift-markdown) including
   **mermaid** diagrams (offline).
-- A **Quick Look preview extension**: press space on a `.zip` in Finder to see an HTML
-  listing of its contents (no extraction).
+- A **Quick Look preview extension**: press space on a supported archive in Finder to see an
+  HTML listing of its contents (no extraction).
 
 ## Building
 
@@ -33,5 +36,6 @@ A free personal Apple ID team is sufficient (no paid Developer Program membershi
 ## Dependencies
 
 - [ZIPFoundation](https://github.com/weichsel/ZIPFoundation) — pure-Swift zip reading (MIT).
+- [SWCompression](https://github.com/tsolomko/SWCompression) — pure-Swift tar/gzip/bzip2/xz/7z reading (MIT).
 - [swift-markdown](https://github.com/swiftlang/swift-markdown) — Markdown parsing (Apache 2.0).
 - [mermaid](https://github.com/mermaid-js/mermaid) — vendored offline for diagram rendering (MIT).

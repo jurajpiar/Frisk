@@ -6,7 +6,7 @@ import Quartz   // QLPreviewPanel, QLPreviewItem, QLPreviewPanelDataSource/Deleg
 /// extracted to a temporary file on demand (and cached) before being handed to the panel.
 final class QuickLookController: NSObject, QLPreviewPanelDataSource, QLPreviewPanelDelegate {
     private let archiveURL: URL
-    private let reader: ZipArchiveReader
+    private let reader: ArchiveReading
     private let tempRoot: URL
     private var extracted: [String: URL] = [:]   // entry path -> extracted temp file URL
 
@@ -20,7 +20,7 @@ final class QuickLookController: NSObject, QLPreviewPanelDataSource, QLPreviewPa
 
     init(archiveURL: URL) {
         self.archiveURL = archiveURL
-        self.reader = ZipArchiveReader(archiveURL: archiveURL)
+        self.reader = ArchiveReaders.reader(for: archiveURL)
         self.tempRoot = FileManager.default.temporaryDirectory
             .appendingPathComponent("ZipLookQL-\(UUID().uuidString)", isDirectory: true)
         super.init()

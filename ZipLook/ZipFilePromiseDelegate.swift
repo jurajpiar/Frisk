@@ -6,7 +6,7 @@ import AppKit
 /// the main thread.
 final class ZipFilePromiseDelegate: NSObject, NSFilePromiseProviderDelegate {
     private let archiveURL: URL
-    private let reader: ZipArchiveReader
+    private let reader: ArchiveReading
 
     /// Serial background queue that the system uses to fulfil promise writes.
     private let workQueue: OperationQueue = {
@@ -19,7 +19,7 @@ final class ZipFilePromiseDelegate: NSObject, NSFilePromiseProviderDelegate {
 
     init(archiveURL: URL) {
         self.archiveURL = archiveURL
-        self.reader = ZipArchiveReader(archiveURL: archiveURL)
+        self.reader = ArchiveReaders.reader(for: archiveURL)
     }
 
     /// The filename the dropped file should take (last path component of the entry).
