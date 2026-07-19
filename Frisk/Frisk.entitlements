@@ -18,12 +18,17 @@
 	     fails with Cocoa 256. -->
 	<key>com.apple.security.files.bookmarks.app-scope</key>
 	<true/>
-	<!-- Shared container with the File Provider extension (stage 07): carries the
-	     security-scoped bookmark of each opened zip, keyed by domain identifier. -->
-	<key>com.apple.security.application-groups</key>
+	<!-- Sparkle updater: the sandboxed app must reach Sparkle's installer/status
+	     XPC services by mach name. -->
+	<key>com.apple.security.temporary-exception.mach-lookup.global-name</key>
 	<array>
-		<string>group.org.deadkittens.frisk</string>
-		<string>group.org.deadkittens.frisk.share</string>
+		<string>org.deadkittens.Frisk-spks</string>
+		<string>org.deadkittens.Frisk-spki</string>
 	</array>
+	<!-- The app-group container shared with the File Provider extension (stage 07,
+	     groups group.org.deadkittens.frisk[.share]) is intentionally absent in v1:
+	     the extension isn't embedded, ArchiveDomainStore no-ops without it, and the
+	     entitlement would force a provisioning profile on Developer ID builds.
+	     Restore it when the extension ships. -->
 </dict>
 </plist>

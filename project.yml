@@ -19,6 +19,10 @@ packages:
   SWCompression:
     url: https://github.com/tsolomko/SWCompression
     from: "4.8.0"
+  # Over-the-air updates; the appcast feed is hosted and signed via Amore.
+  Sparkle:
+    url: https://github.com/sparkle-project/Sparkle
+    from: "2.8.0"
 
 # Signing: DEVELOPMENT_TEAM is supplied by Config/Signing.xcconfig (git-ignored). Copy
 # Config/Signing.xcconfig.example → Config/Signing.xcconfig and set your Apple Development
@@ -39,6 +43,7 @@ targets:
       - package: SWCompression
       - package: swift-markdown
         product: Markdown
+      - package: Sparkle
       - target: PreviewExtension       # Quick Look preview appex (stage 05)
       # File Provider appex (stage 07) is blocked by an extension sandbox limit on this
       # setup (see 07_file_provider/outputs/STATUS.md) — not embedded in the v1 app.
@@ -51,6 +56,7 @@ targets:
         SWIFT_VERSION: "5.0"
         CODE_SIGN_ENTITLEMENTS: Frisk/Frisk.entitlements
         CODE_SIGN_STYLE: Automatic
+        ENABLE_HARDENED_RUNTIME: YES   # required for notarization
         DEVELOPMENT_LANGUAGE: en-GB
     info:
       path: Frisk/Info.plist
@@ -58,7 +64,16 @@ targets:
         CFBundleDisplayName: Frisk
         CFBundleDevelopmentRegion: en_GB
         CFBundleIconFile: AppIcon
+        # Reference the build settings so tools can override versions at archive
+        # time (e.g. `amore release --build-number auto`).
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        CFBundleShortVersionString: $(MARKETING_VERSION)
         LSApplicationCategoryType: public.app-category.utilities
+        # Sparkle update feed, hosted by Amore (org.deadkittens.Frisk).
+        SUFeedURL: https://api.amore.computer/v1/apps/org.deadkittens.Frisk/appcast.xml
+        SUPublicEDKey: fFawoODRsfWkOW2NIJzGhHtljzVgmxwEnIOGgf3ZQOg=
+        # Required for Sparkle's installer XPC service under the App Sandbox.
+        SUEnableInstallerLauncherService: true
         CFBundleDocumentTypes:
           - CFBundleTypeName: Archive
             CFBundleTypeRole: Viewer
@@ -114,6 +129,7 @@ targets:
         SWIFT_VERSION: "5.0"
         CODE_SIGN_ENTITLEMENTS: PreviewExtension/PreviewExtension.entitlements
         CODE_SIGN_STYLE: Automatic
+        ENABLE_HARDENED_RUNTIME: YES   # required for notarization
     info:
       path: PreviewExtension/Info.plist
       properties:

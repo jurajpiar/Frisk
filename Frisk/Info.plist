@@ -40,11 +40,17 @@
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleShortVersionString</key>
-	<string>1.0</string>
+	<string>$(MARKETING_VERSION)</string>
 	<key>CFBundleVersion</key>
-	<string>1</string>
+	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>LSApplicationCategoryType</key>
 	<string>public.app-category.utilities</string>
+	<key>SUEnableInstallerLauncherService</key>
+	<true/>
+	<key>SUFeedURL</key>
+	<string>https://api.amore.computer/v1/apps/org.deadkittens.Frisk/appcast.xml</string>
+	<key>SUPublicEDKey</key>
+	<string>fFawoODRsfWkOW2NIJzGhHtljzVgmxwEnIOGgf3ZQOg=</string>
 	<key>UTImportedTypeDeclarations</key>
 	<array>
 		<dict>
