@@ -141,6 +141,14 @@ targets:
         CODE_SIGN_ENTITLEMENTS: Frisk/FriskAppStore.entitlements
         CODE_SIGN_STYLE: Automatic
         DEVELOPMENT_LANGUAGE: en-GB
+      configs:
+        # In Debug, both app targets would emit "Frisk.app" into the shared products
+        # dir; the FriskTests test action resolves TEST_HOST by that product path and
+        # schedules both producers ("Multiple commands produce Frisk.app"). A distinct
+        # Debug name avoids the clash; Release (what the App Store archive uses) keeps
+        # the proper "Frisk.app" name.
+        Debug:
+          PRODUCT_NAME: FriskAppStore
     info:
       path: FriskAppStore/Info.plist
       properties:
