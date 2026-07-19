@@ -1,5 +1,7 @@
 import SwiftUI
+#if canImport(Sparkle)
 import Sparkle
+#endif
 
 /// Application entry point. SwiftUI lifecycle (D1): opening a zip shows its entries in an
 /// in-app table; entries drag out to Finder and preview in-app (spacebar). A separate
@@ -9,12 +11,15 @@ struct FriskApp: App {
     @NSApplicationDelegateAdaptor(AppDelegate.self) private var appDelegate
     @StateObject private var store = ArchiveStore.shared
 
+    #if canImport(Sparkle)
     /// Sparkle updater; checks the Amore-hosted appcast (SUFeedURL in Info.plist).
+    /// Absent in the Mac App Store build, where the store delivers updates.
     private let updaterController = SPUStandardUpdaterController(
         startingUpdater: true,
         updaterDelegate: nil,
         userDriverDelegate: nil
     )
+    #endif
 
     var body: some Scene {
         WindowGroup {
@@ -29,9 +34,11 @@ struct FriskApp: App {
             }
             CommandGroup(replacing: .appInfo) {
                 Button("About Frisk") { AppDelegate.showAboutPanel() }
+                #if canImport(Sparkle)
                 Button("Check for Updates\u{2026}") {
                     updaterController.updater.checkForUpdates()
                 }
+                #endif
             }
         }
     }

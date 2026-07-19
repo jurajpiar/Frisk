@@ -74,7 +74,7 @@ targets:
         SUPublicEDKey: fFawoODRsfWkOW2NIJzGhHtljzVgmxwEnIOGgf3ZQOg=
         # Required for Sparkle's installer XPC service under the App Sandbox.
         SUEnableInstallerLauncherService: true
-        CFBundleDocumentTypes:
+        CFBundleDocumentTypes: &archive_doc_types
           - CFBundleTypeName: Archive
             CFBundleTypeRole: Viewer
             LSHandlerRank: Alternate
@@ -86,7 +86,7 @@ targets:
               - public.tar-archive
               - org.7-zip.7-zip-archive
               - org.tukaani.xz-archive
-        UTImportedTypeDeclarations:
+        UTImportedTypeDeclarations: &archive_imported_types
           - UTTypeIdentifier: org.7-zip.7-zip-archive
             UTTypeDescription: 7-Zip Archive
             UTTypeConformsTo:
@@ -110,6 +110,49 @@ targets:
               public.filename-extension:
                 - tgz
                 - tar.gz
+
+  # Mac App Store variant: identical sources and product, but no Sparkle (the App
+  # Store delivers updates; self-updating frameworks are rejected in review), no
+  # Sparkle Info.plist keys, and entitlements without the mach-lookup exceptions.
+  FriskAppStore:
+    type: application
+    platform: macOS
+    deploymentTarget: "14.0"
+    sources:
+      # Exclude the Frisk target's Info.plist — XcodeGen only auto-excludes this
+      # target's own info path, and a stray Info.plist in Resources fails App
+      # Store validation (treated as a nested bundle).
+      - path: Frisk
+        excludes:
+          - Info.plist
+    dependencies:
+      - package: ZIPFoundation
+      - package: SWCompression
+      - package: swift-markdown
+        product: Markdown
+      - target: PreviewExtension
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: org.deadkittens.Frisk
+        PRODUCT_NAME: Frisk
+        MARKETING_VERSION: "1.0"
+        CURRENT_PROJECT_VERSION: "1"
+        SWIFT_VERSION: "5.0"
+        CODE_SIGN_ENTITLEMENTS: Frisk/FriskAppStore.entitlements
+        CODE_SIGN_STYLE: Automatic
+        DEVELOPMENT_LANGUAGE: en-GB
+    info:
+      path: FriskAppStore/Info.plist
+      properties:
+        CFBundleDisplayName: Frisk
+        CFBundleDevelopmentRegion: en_GB
+        CFBundleIconFile: AppIcon
+        CFBundleVersion: $(CURRENT_PROJECT_VERSION)
+        CFBundleShortVersionString: $(MARKETING_VERSION)
+        LSApplicationCategoryType: public.app-category.utilities
+        ITSAppUsesNonExemptEncryption: false
+        CFBundleDocumentTypes: *archive_doc_types
+        UTImportedTypeDeclarations: *archive_imported_types
 
   PreviewExtension:
     type: app-extension
@@ -197,6 +240,15 @@ targets:
         CODE_SIGN_STYLE: Automatic
 
 schemes:
+  FriskAppStore:
+    build:
+      targets:
+        FriskAppStore: all
+    run:
+      config: Debug
+    archive:
+      config: Release
+
   Frisk:
     build:
       targets:
