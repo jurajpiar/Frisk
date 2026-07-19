@@ -1,0 +1,4 @@
+# GitHub mirror — read from .github/ with highest precedence; Forgejo ignores this
+# directory. The Codeberg equivalent lives in .forgejo/CODEOWNERS (different handle:
+# "deadkittens" on GitHub is an unrelated stranger's account).
+* @jurajpiar

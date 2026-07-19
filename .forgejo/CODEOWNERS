@@ -1,0 +1,3 @@
+# Codeberg (Forgejo) — read from .forgejo/, root, or docs/; GitHub ignores this
+# directory. The GitHub mirror's equivalent lives in .github/CODEOWNERS.
+* @deadkittens
