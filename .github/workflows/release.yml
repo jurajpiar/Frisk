@@ -31,6 +31,15 @@ jobs:
       - name: Generate Xcode project
         run: xcodegen generate
 
+      # The runner's Homebrew skips the cask's Binary artifact (tap-trust policy), so
+      # the action's `command -v amore` check fails. Install the cask here and link the
+      # CLI by hand; the action's own `brew install --cask amore` then no-ops.
+      - name: Pre-install Amore CLI
+        run: |
+          brew install --cask amore
+          command -v amore || sudo ln -sf /Applications/Amore.app/Contents/MacOS/AmoreCLI /usr/local/bin/amore
+          amore --version
+
       - name: Read version from tag
         id: version
         run: |
