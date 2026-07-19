@@ -164,6 +164,33 @@ final class CompressedArchiveReaderTests: XCTestCase {
         XCTAssertEqual(try Data(contentsOf: out), firstData)
     }
 
+    /// Listing a `.gz` reads the ISIZE trailer without decompressing, so a mislabelled
+    /// file must still be rejected at open time via the magic-byte check.
+    func testCorruptGzFailsAtListing() throws {
+        let url = try write(Data("definitely not gzip data".utf8), as: "broken.txt.gz")
+        let reader = ArchiveReaders.reader(for: url)
+        XCTAssertThrowsError(try reader.listEntries()) { error in
+            guard case ArchiveReaderError.cannotOpen = error else {
+                return XCTFail("expected cannotOpen, got \(error)")
+            }
+        }
+    }
+
+    /// One reader instance serves several extracts; the second comes from the
+    /// decompression cache and must return the same exact bytes.
+    func testRepeatedExtractsFromOneReader() throws {
+        let gz = try GzipArchive.archive(data: try makeTarData())
+        let url = try write(gz, as: "fixture.tar.gz")
+        let reader = ArchiveReaders.reader(for: url)
+
+        let outFirst = tempDir.appendingPathComponent("repeat-first.txt")
+        let outSecond = tempDir.appendingPathComponent("repeat-second.bin")
+        try reader.extractEntry(atPath: "first.txt", to: outFirst)
+        try reader.extractEntry(atPath: "nested/second.bin", to: outSecond)
+        XCTAssertEqual(try Data(contentsOf: outFirst), firstData)
+        XCTAssertEqual(try Data(contentsOf: outSecond), secondData)
+    }
+
     // MARK: - Guards
 
     func testZipSlipPathRejected() throws {
