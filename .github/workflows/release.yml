@@ -1,0 +1,52 @@
+name: Amore Release
+run-name: Release ${{ github.ref_name }}
+
+# Push a version tag to publish: `git tag v1.0.1 && git push codeberg v1.0.1`
+# (the dual push URL mirrors the tag to GitHub, which triggers this workflow).
+# Prerelease tags like v1.0.1-beta.1 route to the Sparkle beta channel.
+on:
+  push:
+    tags: ['v*']
+
+concurrency:
+  group: amore-release
+  cancel-in-progress: true
+
+jobs:
+  release:
+    runs-on: macos-26
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install XcodeGen
+        run: brew install xcodegen
+
+      # project.yml requires Config/Signing.xcconfig (git-ignored). The release
+      # archive signs with the Developer ID material supplied to the action, so the
+      # team here only needs to satisfy automatic signing during archiving.
+      - name: Create signing config
+        run: printf 'DEVELOPMENT_TEAM = %s\n' "${{ secrets.APPLE_TEAM_ID }}" > Config/Signing.xcconfig
+
+      - name: Generate Xcode project
+        run: xcodegen generate
+
+      - name: Read version from tag
+        id: version
+        run: |
+          ref="${GITHUB_REF_NAME#v}"
+          echo "number=${ref%%-*}" >> "$GITHUB_OUTPUT"
+
+      - uses: AmoreComputer/release-action@v1
+        with:
+          scheme: Frisk
+          codesign-identity: ${{ secrets.CODESIGN_IDENTITY }}
+          dev-id-cert-p12: ${{ secrets.DEV_ID_CERT_P12 }}
+          dev-id-cert-password: ${{ secrets.DEV_ID_CERT_PASSWORD }}
+          sparkle-private-key: ${{ secrets.SPARKLE_PRIVATE_KEY }}
+          asc-api-key-id: ${{ secrets.ASC_API_KEY_ID }}
+          asc-api-issuer: ${{ secrets.ASC_API_ISSUER }}
+          asc-api-key: ${{ secrets.ASC_API_KEY }}
+          amore-token: ${{ secrets.AMORE_TOKEN }}
+          channel: ${{ contains(github.ref_name, '-') && 'beta' || '' }}
+          marketing-version: ${{ steps.version.outputs.number }}
